@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини-Приложение для Telegram</title>
+    <title>Мини-приложение для Telegram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1>Привет! Это мое тестовое приложение.</h1>
-    <button onclick="sendDataToTelegram()">Отправить данные в Telegram</button>
+    <h1>Привет! Это мини-приложение для Telegram.</h1>
+    <button onclick="sendDataToTelegram()">Отправить данные</button>
 
     <script>
-        Telegram.WebApp.init();
+        Telegram.WebApp.init(); // Инициализация Telegram Web App
 
+        // Функция отправки данных
         function sendDataToTelegram() {
-            Telegram.WebApp.sendData("Данные из мини-приложения");
+            Telegram.WebApp.sendData("Это данные от мини-приложения!");
         }
 
+        // Слушаем событие клика по кнопке
         Telegram.WebApp.onEvent('mainButtonClicked', function() {
-            alert('Кнопка была нажата!');
+            alert('Вы нажали кнопку!');
         });
     </script>
 </body>
