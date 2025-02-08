@@ -3,30 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини-приложение для Telegram</title>
+    <title>Карточная Игра</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: #f0f4f8;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
         }
-        .container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
+
+        .game-container {
             background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            margin-top: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
+
         h1 {
             color: #4CAF50;
         }
+
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .card {
+            width: 80px;
+            height: 120px;
+            border-radius: 8px;
+            background-color: #fff;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
         button {
             background-color: #4CAF50;
             color: white;
@@ -37,69 +73,83 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #45a049;
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
+
         .result {
-            font-size: 18px;
             margin-top: 20px;
+            font-size: 18px;
             padding: 10px;
-            background-color: #f0f0f0;
+            background-color: #f9f9f9;
             border-radius: 5px;
-            display: none;
         }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Мини-приложение</h1>
-    <p>Введите текст, чтобы отправить его в Telegram.</p>
-    
-    <!-- Форма для ввода данных -->
-    <input type="text" id="userInput" placeholder="Введите что-нибудь...">
-    
-    <button onclick="sendToTelegram()">Отправить</button>
-    
+<div class="game-container">
+    <h1>Карточная Игра</h1>
+    <div class="cards" id="cards-container">
+        <!-- Карты будут добавлены сюда динамически -->
+    </div>
+    <div class="controls">
+        <button onclick="shuffleCards()">Перетасовать карты</button>
+    </div>
     <div class="result" id="result"></div>
 </div>
 
 <script>
     Telegram.WebApp.init();
 
-    // Функция для отправки данных в Telegram
-    function sendToTelegram() {
-        var input = document.getElementById("userInput").value;
-        
-        // Проверка на пустой ввод
-        if (input.trim() === "") {
-            alert("Пожалуйста, введите что-то!");
-            return;
-        }
+    // Массив карт (пока только символы для примера)
+    const cards = ["❤️", "♦️", "♣️", "♠️", "♦️", "❤️", "♠️", "♣️"];
 
-        // Отправка данных
-        Telegram.WebApp.sendData(input);
+    // Функция для генерации карт
+    function generateCards() {
+        const cardsContainer = document.getElementById("cards-container");
+        cardsContainer.innerHTML = ""; // Очищаем контейнер перед добавлением новых карт
 
-        // Показать результат
-        document.getElementById("result").innerText = "Вы отправили: " + input;
-        document.getElementById("result").style.display = "block";
+        cards.forEach((card, index) => {
+            const cardElement = document.createElement("div");
+            cardElement.classList.add("card");
+            cardElement.innerText = card;
+            cardElement.onclick = () => cardClicked(index);
+            cardsContainer.appendChild(cardElement);
+        });
     }
 
-    // Функция для изменения главной кнопки
+    // Функция для обработки клика по карте
+    function cardClicked(index) {
+        const result = document.getElementById("result");
+        result.innerText = `Вы выбрали карту: ${cards[index]}`;
+    }
+
+    // Функция для тасования карт
+    function shuffleCards() {
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]]; // Меняем элементы местами
+        }
+        generateCards(); // Перегенерируем карты после тасования
+    }
+
+    // Инициализация игры при загрузке
+    generateCards();
+
+    // Скрытие кнопки по завершению игры
     Telegram.WebApp.MainButton.setParams({
         text: "Закрыть"
     });
     Telegram.WebApp.MainButton.show();
-    
-    // Закрытие Web App по нажатию кнопки
+
     Telegram.WebApp.MainButton.onClick(function() {
         Telegram.WebApp.close();
     });
